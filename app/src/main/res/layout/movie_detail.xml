@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/movieOriginalTitle"
+            style="@style/Original_title" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp">
+
+            <ImageView
+                android:id="@+id/movieThumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/movieThumbnail"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/releaseDate"
+                    style="@style/Title" />
+
+                <TextView
+                    android:id="@+id/averageRating"
+                    style="@style/SubTitle" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/darkGray"
+            android:layout_marginTop="10dp"
+            />
+        <TextView
+            android:id="@+id/overview"
+            style="@style/Overview" />
+    </LinearLayout>
+</ScrollView>
