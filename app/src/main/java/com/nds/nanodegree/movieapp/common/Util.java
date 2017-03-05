@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import java.io.IOException;
@@ -101,24 +102,31 @@ public final class Util {
     }
 
     /**
-     * Build popular movie search URL
+     * Builds movie search URL based on selection.
      * @return search URL as string
      */
-    public static String buildPopularMovieSearchURL(){
-        Uri uri = Uri.parse(Constants.MOVIE_SEARCH_BY_POPULAR).buildUpon().
-                appendQueryParameter(Constants.QUERY_PARAM_API_KEY, Constants.API_KEY).build();
-        return uri.toString();
+    public static String buildMovieSearchURL(int selection){
+        switch(selection){
+            case Constants.SEARCH_BY_POPULARITY :
+                Uri popularUri = Uri.parse(Constants.MOVIE_SEARCH_BY_POPULAR).buildUpon().
+                        appendQueryParameter(Constants.QUERY_PARAM_API_KEY, Constants.API_KEY).build();
+                return popularUri.toString();
+            case Constants.SEARCH_BY_RATING:
+                Uri ratingUri = Uri.parse(Constants.MOVIE_SEARCH_BY_TOP_RATED).buildUpon().
+                        appendQueryParameter(Constants.QUERY_PARAM_API_KEY, Constants.API_KEY).build();
+                return ratingUri.toString();
+        }
+        return null;
     }
 
-
     /**
-     * Build movie search by rating URL
-     * @return search URL as string
+     * Method to check if API KEY is not empty or null.
+     * returns true when key is missing, otherwise false.
+     * @param API_KEY
+     * @return
      */
-    public static String buildMovieSearchURLByRating(){
-        Uri uri = Uri.parse(Constants.MOVIE_SEARCH_BY_TOP_RATED).buildUpon().
-                appendQueryParameter(Constants.QUERY_PARAM_API_KEY, Constants.API_KEY).build();
-        return uri.toString();
+    public static boolean isAPIKeyMissing(String API_KEY){
+        return API_KEY == null || TextUtils.isEmpty(API_KEY);
     }
 
     /**

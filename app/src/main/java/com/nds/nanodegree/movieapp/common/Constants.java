@@ -16,5 +16,7 @@ public final class Constants {
     public static final String DEVICE_SIZE="w185";
     public static final String MOVIE_LIST_BUNDLE_KEY="movieListBundle";
     public static final String SELECTED_MOVIE_DETAIL_BUNDLE_KEY="selectedMovieDetail";
+    public static final int SEARCH_BY_POPULARITY=0;
+    public static final int SEARCH_BY_RATING=1;
 }
 
