@@ -37,7 +37,7 @@ public class LauncherActivity extends AppCompatActivity{
     private List<MovieModel> mMovieList;
     private Context mSourceContext;
     private ProgressBar mMovieDataFetchProgressBar;
-    private AlertDialog networkAlertDialog;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +51,7 @@ public class LauncherActivity extends AppCompatActivity{
             mMovieList = movieSearchResult.getMovieList();
             setGridAdapter();
         }else{
-            fetchMovieDataFor(Util.buildPopularMovieSearchURL());
+            fetchMovieData(mSourceContext, Constants.SEARCH_BY_POPULARITY);
         }
 
         mPosterGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -63,12 +63,35 @@ public class LauncherActivity extends AppCompatActivity{
         });
     }
 
+    /**
+     * This method will check for API KEY, if no API KEY, alert dialog will be shown to user.
+     * Otherwise based on search criteria it will fetch movie results.
+     * @param mSourceContext
+     * @param searchBy
+     */
+    private void fetchMovieData(Context mSourceContext, int searchBy) {
+        if(Util.isAPIKeyMissing(Constants.API_KEY)){
+            displayAlertDialog(mSourceContext, getResources().getString(R.string.no_api_key));
+        }else{
+            fetchMovieDataFor(Util.buildMovieSearchURL(searchBy));
+            switch(searchBy){
+                case Constants.SEARCH_BY_POPULARITY :
+                    setTitle(R.string.popular_movie);
+                    break;
+                case Constants.SEARCH_BY_RATING :
+                    setTitle(R.string.movie_by_rating);
+                    break;
+                default :
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(networkAlertDialog != null){
-            networkAlertDialog.dismiss();
-            networkAlertDialog = null;
+        if(alertDialog != null){
+            alertDialog.dismiss();
+            alertDialog = null;
         }
     }
 
@@ -104,17 +127,31 @@ public class LauncherActivity extends AppCompatActivity{
         movieSearchResult = null;
         switch(item.getItemId()){
             case R.id.byPopular :
-                fetchMovieDataFor(Util.buildPopularMovieSearchURL());
-                setTitle(R.string.popular_movie);
+                fetchMovieData(mSourceContext, Constants.SEARCH_BY_POPULARITY);
                 break;
             case R.id.byRating :
-                fetchMovieDataFor(Util.buildMovieSearchURLByRating());
-                setTitle(R.string.movie_by_rating);
+                fetchMovieData(mSourceContext, Constants.SEARCH_BY_RATING);
                 break;
             default :
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    /**
+     * Display alert dialog when API KEY is not present.
+     * @param mSourceContext
+     */
+    private void displayAlertDialog(Context mSourceContext, String msg){
+        AlertDialog.Builder builder = new AlertDialog.Builder(mSourceContext).setCancelable(false)
+                .setMessage(msg).setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        finish();
+                    }
+                });
+        alertDialog = builder.show();
     }
 
     /**
@@ -140,15 +177,7 @@ public class LauncherActivity extends AppCompatActivity{
                 e.printStackTrace();
             }
         }else{
-            AlertDialog.Builder builder = new AlertDialog.Builder(mSourceContext).setCancelable(false)
-                    .setMessage(R.string.no_internet_error).setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                            finish();
-                        }
-                    });
-            networkAlertDialog = builder.show();
+            displayAlertDialog(mSourceContext, getResources().getString(R.string.no_internet_error));
         }
     }
 
