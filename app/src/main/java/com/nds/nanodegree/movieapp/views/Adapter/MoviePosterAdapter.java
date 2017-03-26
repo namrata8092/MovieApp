@@ -1,12 +1,11 @@
 package com.nds.nanodegree.movieapp.views.Adapter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,57 +16,63 @@ import com.nds.nanodegree.movieapp.model.MovieModel;
 
 import java.util.List;
 
-/*MoviePosterAdapter is custom adadpter to display movie poster and movie name.
+/*MoviePosterAdapter is custom adapter to display movie poster and movie name.
 * */
 
 /**
  * Created by Namrata Shah on 2/26/2017.
  */
-public class MoviePosterAdapter extends ArrayAdapter<MovieModel> {
-    List<MovieModel> movieList;
+public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.MoviePosterViewHolder> {
+    private List<MovieModel> movieList;
+    private LayoutInflater mInflater;
+    private AdapterView.OnItemClickListener cellClickListener;
 
-    public MoviePosterAdapter(Context context, int resource, List<MovieModel> objects) {
-        super(context, 0, objects);
-        this.movieList = objects;
+    public MoviePosterAdapter(Context context, List<MovieModel> movies, AdapterView.OnItemClickListener clickListener){
+        this.movieList = movies;
+        this.mInflater = LayoutInflater.from(context);
+        this.cellClickListener = clickListener;
+    }
+
+    public class MoviePosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        ImageView mPosterIV;
+        TextView mMovieTitleTV;
+
+        public MoviePosterViewHolder(View view){
+            super(view);
+            mPosterIV = (ImageView) view.findViewById(R.id.moviePoster);
+            mMovieTitleTV = (TextView)view.findViewById(R.id.movieTitle);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            cellClickListener.onItemClick(null, v, getAdapterPosition(), v.getId());
+        }
     }
 
     @Override
-    public int getCount() {
+    public MoviePosterViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
+        View moviePosterView = mInflater.inflate(R.layout.grid_cell_layout, parent, false);
+        final MoviePosterViewHolder holder = new MoviePosterViewHolder(moviePosterView);
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(MoviePosterViewHolder holder, int position) {
+        MovieModel model = movieList.get(position);
+        if(model != null){
+            holder.mMovieTitleTV.setText(model.getTitle());
+            Glide.with(holder.mPosterIV.getContext()).load(
+                    Util.createImageURI(model.getPosterURL())).into(holder.mPosterIV);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
         if(movieList!= null)
             return movieList.size();
         else return 0;
     }
 
-    @Nullable
-    @Override
-    public MovieModel getItem(int position) {
-        return movieList.get(position);
-    }
 
-    @Override
-    public int getPosition(MovieModel item) {
-        return super.getPosition(item);
-    }
-
-    @NonNull
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        MovieModel model = getItem(position);
-        if(convertView == null){
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.grid_cell_layout, parent, false);
-        }
-        ImageView mPosterIV = (ImageView) convertView.findViewById(R.id.moviePoster);
-        TextView mMovieTitleTV = (TextView)convertView.findViewById(R.id.movieTitle);
-        if(model != null){
-            mMovieTitleTV.setText(model.getTitle());
-            Glide.with(mPosterIV.getContext()).load(Util.createImageURI(model.getPosterURL())).into(mPosterIV);
-        }
-        return convertView;
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-    }
 }

@@ -4,22 +4,26 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ProgressBar;
 
 import com.nds.nanodegree.movieapp.R;
 import com.nds.nanodegree.movieapp.common.Constants;
 import com.nds.nanodegree.movieapp.common.Util;
+import com.nds.nanodegree.movieapp.databinding.ActivityLauncherBinding;
 import com.nds.nanodegree.movieapp.model.MovieModel;
 import com.nds.nanodegree.movieapp.model.MovieSearchResult;
 import com.nds.nanodegree.movieapp.services.FetchMovieData;
+import com.nds.nanodegree.movieapp.views.Adapter.MovieItemDecoration;
 import com.nds.nanodegree.movieapp.views.Adapter.MoviePosterAdapter;
 
 import java.net.MalformedURLException;
@@ -29,23 +33,32 @@ import java.util.List;
 /**
  * Created by Namrata Shah on 2/26/2017.
  */
-public class LauncherActivity extends AppCompatActivity{
+public class LauncherActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
 
-    private GridView mPosterGrid;
+    private RecyclerView mPosterRecyclerView;
     private MoviePosterAdapter mMovieAdapter;
     private MovieSearchResult movieSearchResult;
     private List<MovieModel> mMovieList;
     private Context mSourceContext;
     private ProgressBar mMovieDataFetchProgressBar;
     private AlertDialog alertDialog;
+    private ActivityLauncherBinding mActivityLauncherBinding;
+    private GridLayoutManager mGridLayoutManager;
+    private static final int CELL_WIDTH = 150;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_launcher);
-        mPosterGrid = (GridView)findViewById(R.id.moviePosterGrid);
-        mMovieDataFetchProgressBar = (ProgressBar)findViewById(R.id.movieFetchProgress);
+        mActivityLauncherBinding = DataBindingUtil.setContentView(this, R.layout.activity_launcher);
+        mPosterRecyclerView = mActivityLauncherBinding.moviePosterGrid;
+        mMovieDataFetchProgressBar = mActivityLauncherBinding.movieFetchProgress;
         mSourceContext = this;
+
+        mGridLayoutManager = new GridLayoutManager(getApplicationContext(), Util.calculateNoOfColumns(getApplicationContext(), CELL_WIDTH));
+        mPosterRecyclerView.setLayoutManager(mGridLayoutManager);
+        MovieItemDecoration itemDecoration = new MovieItemDecoration((int)getResources().getDimension(R.dimen.grid_offset));
+        mPosterRecyclerView.addItemDecoration(itemDecoration);
+
         if(savedInstanceState != null && savedInstanceState.containsKey(Constants.MOVIE_LIST_BUNDLE_KEY)){
             movieSearchResult = savedInstanceState.getParcelable(Constants.MOVIE_LIST_BUNDLE_KEY);
             mMovieList = movieSearchResult.getMovieList();
@@ -54,13 +67,6 @@ public class LauncherActivity extends AppCompatActivity{
             fetchMovieData(mSourceContext, Constants.SEARCH_BY_POPULARITY);
         }
 
-        mPosterGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                MovieModel movie = mMovieList.get(i);
-                displayDetailActivity(movie, mSourceContext);
-            }
-        });
     }
 
     /**
@@ -182,9 +188,14 @@ public class LauncherActivity extends AppCompatActivity{
     }
 
     private void setGridAdapter() {
-        mMovieAdapter = new MoviePosterAdapter(getApplicationContext(),
-                R.layout.grid_cell_layout, mMovieList);
-        mPosterGrid.setAdapter(mMovieAdapter);
+        mMovieAdapter = new MoviePosterAdapter(getApplicationContext(), mMovieList, this);
+        mPosterRecyclerView.setAdapter(mMovieAdapter);
         mMovieAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        MovieModel movie = mMovieList.get(position);
+        displayDetailActivity(movie, mSourceContext);
     }
 }

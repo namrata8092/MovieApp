@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView android:id="@+id/moviePoster"
-        android:layout_width="185dp"
-        android:layout_height="278dp"
+        android:layout_width="@dimen/movie_poster_width"
+        android:layout_height="@dimen/movie_poster_height"
         android:layout_alignParentTop="true"/>
 
     <TextView android:id="@+id/movieTitle"

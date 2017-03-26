@@ -145,4 +145,10 @@ public final class Util {
         return dimensions;
     }
 
+    public static int calculateNoOfColumns(Context applicationContext, int CELL_WIDTH) {
+        DisplayMetrics displayMetric = applicationContext.getResources().getDisplayMetrics();
+        float deviceWidth = displayMetric.widthPixels/displayMetric.density;
+        return (int) deviceWidth/CELL_WIDTH;
+    }
+
 }

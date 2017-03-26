@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ProgressBar android:id="@+id/movieFetchProgress"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-<GridView android:id="@+id/moviePosterGrid"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:columnWidth="150dp"
-    android:horizontalSpacing="0dp"
-    android:verticalSpacing="0dp"
-    android:numColumns="auto_fit">
+        <ProgressBar
+            android:id="@+id/movieFetchProgress"
+            android:layout_width="@dimen/progressbar_width_height"
+            android:layout_height="@dimen/progressbar_width_height"
+            android:layout_gravity="center"
+            android:visibility="gone" />
 
-</GridView>
-</FrameLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/moviePosterGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            />
+    </FrameLayout>
+</layout>

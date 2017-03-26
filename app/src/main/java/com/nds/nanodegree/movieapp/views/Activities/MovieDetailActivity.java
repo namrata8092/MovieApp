@@ -2,6 +2,7 @@ package com.nds.nanodegree.movieapp.views.Activities;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.nds.nanodegree.movieapp.R;
 import com.nds.nanodegree.movieapp.common.Constants;
 import com.nds.nanodegree.movieapp.common.Util;
+import com.nds.nanodegree.movieapp.databinding.MovieDetailBinding;
 import com.nds.nanodegree.movieapp.model.MovieModel;
 
 /* MovieDetailActivity will display detail of selected movie.
@@ -28,12 +30,12 @@ Movie detail includes
 public class MovieDetailActivity extends AppCompatActivity {
     private MovieModel movieModel;
     private static int[] dimensions = new int[2];
+    private MovieDetailBinding mMovieDetailBinding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.movie_detail);
-
+        mMovieDetailBinding = DataBindingUtil.setContentView(this, R.layout.movie_detail);
         if(savedInstanceState != null && savedInstanceState.containsKey(Constants.SELECTED_MOVIE_DETAIL_BUNDLE_KEY)){
             movieModel = savedInstanceState.getParcelable(Constants.SELECTED_MOVIE_DETAIL_BUNDLE_KEY);
         }else{
@@ -43,11 +45,11 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         }
 
-        TextView mTitleTV = (TextView)findViewById(R.id.movieOriginalTitle);
-        ImageView mThumbNailImageView = (ImageView)findViewById(R.id.movieThumbnail);
-        TextView mReleaseDateTV = (TextView)findViewById(R.id.releaseDate);
-        TextView mAverageRatingTV = (TextView)findViewById(R.id.averageRating);
-        TextView mOverviewTV = (TextView)findViewById(R.id.overview);
+        TextView mTitleTV = mMovieDetailBinding.movieOriginalTitle;
+        ImageView mThumbNailImageView = mMovieDetailBinding.movieThumbnail;
+        TextView mReleaseDateTV = mMovieDetailBinding.releaseDate;
+        TextView mAverageRatingTV = mMovieDetailBinding.averageRating;
+        TextView mOverviewTV = mMovieDetailBinding.overview;
 
         mTitleTV.setText(movieModel.getOriginalTitle());
 
