@@ -21,6 +21,10 @@
         <activity android:name=".views.Activities.MovieDetailActivity"
             android:parentActivityName=".views.Activities.LauncherActivity"
             android:label="@string/detail_activity_title"/>
+
+        <provider android:name=".dbo.MovieContentProvider"
+            android:authorities="com.nds.nanodegree.movieapp"
+             android:exported="false"/>
     </application>
 
 </manifest>
