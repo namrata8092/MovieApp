@@ -36,6 +36,7 @@
         <item name="android:textSize">@dimen/font_medium</item>
         <item name="android:gravity">left</item>
         <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
     </style>
@@ -54,5 +55,11 @@
 
     <style name="SubTitle" parent="Title">
         <item name="android:textSize">@dimen/font_medium</item>
+    </style>
+
+    <style name="favorite">
+        <item name="android:layout_width">@dimen/favorite_icon_width</item>
+        <item name="android:layout_height">@dimen/favorite_icon_height</item>
+        <item name="android:background">@mipmap/ic_launcher</item>
     </style>
 </resources>

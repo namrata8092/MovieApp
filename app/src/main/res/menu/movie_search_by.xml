@@ -3,8 +3,11 @@
     <item
         android:id="@+id/byPopular"
         android:showAsAction="ifRoom"
-        android:title="Popular Movie" />
+        android:title="@string/popular_movie" />
     <item
         android:id="@+id/byRating"
-        android:title="Movies by Rating" />
+        android:title="@string/movie_by_rating" />
+    <item
+        android:id="@+id/byFavorite"
+        android:title="@string/favorite_movie" />
 </menu>

@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -74,5 +75,18 @@ public class MovieDetailActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         dimensions = Util.getScreenDimensions(getApplicationContext());
         super.onConfigurationChanged(newConfig);
+    }
+
+    public void saveFavorite(View view) {
+        //TODO insert movie detail in db if favorite selected, remove from db if favorite unselected
+
+    }
+
+    public void fetchTrailer(View view) {
+        //TODO query moviedb for trailer n dispplay in list view
+    }
+
+    public void fetchReview(View view) {
+        //TODO query moviedb for review n dispplay in list view
     }
 }

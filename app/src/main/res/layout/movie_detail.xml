@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -43,6 +44,10 @@
                         android:id="@+id/averageRating"
                         style="@style/SubTitle" />
 
+                    <ImageView android:id="@+id/favoriteIcon"
+                        style="@style/favorite"
+                        android:onClick="saveFavorite"/>
+
                 </LinearLayout>
             </RelativeLayout>
 
@@ -55,6 +60,32 @@
             <TextView
                 android:id="@+id/overview"
                 style="@style/Overview" />
+
+            <TextView android:id="@+id/trailer"
+                style="@style/SubTitle"
+                android:drawableLeft="@mipmap/ic_launcher"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                tool:text="Trailer"
+                android:onClick="fetchTrailer"/>
+
+            <ListView android:id="@+id/trailerList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"></ListView>
+
+            <TextView android:id="@+id/review"
+                style="@style/SubTitle"
+                android:drawableLeft="@mipmap/ic_launcher"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                tool:text="Review"
+                android:onClick="fetchReview"/>
+
+            <ListView android:id="@+id/reviewList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"></ListView>
         </LinearLayout>
     </ScrollView>
 

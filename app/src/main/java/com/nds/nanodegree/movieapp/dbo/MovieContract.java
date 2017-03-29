@@ -24,9 +24,13 @@ public final class MovieContract {
         public static final String TABLE_NAME = "movieDetail";
 
         public static final String COLUMN_NAME_MOVIE_TITLE = "title";
-        public static final String COLUMN_NAME_MOVIE_SUBTITLE = "subTitle";
         public static final String COLUMN_NAME_MOVIE_POSTER_URL = "posterUrl";
+        public static final String COLUMN_NAME_MOVIE_BACKDROP_URL = "backDropURL";
         public static final String COLUMN_NAME_MOVIE_ID = "movieId";
+        public static final String COLUMN_NAME_MOVIE_OVERVIEW = "overview";
+        public static final String COLUMN_NAME_MOVIE_RELEASE_DATE = "releaseDate";
+        public static final String COLUMN_NAME_MOVIE_VOTE_AVERAGE = "voteAverage";
         public static final String COLUMN_NAME_MOVIE_FAVORITE = "favorite";
+
     }
 }

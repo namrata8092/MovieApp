@@ -11,4 +11,6 @@
     <dimen name="movie_poster_width">185dp</dimen>
     <dimen name="movie_poster_height">278dp</dimen>
     <dimen name="layout_margin">10dp</dimen>
+    <dimen name="favorite_icon_width">40dp</dimen>
+    <dimen name="favorite_icon_height">40dp</dimen>
 </resources>

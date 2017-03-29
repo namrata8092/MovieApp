@@ -3,6 +3,7 @@
     <string name="detail_activity_title">Movie Details</string>
     <string name="popular_movie">Popular Movies</string>
     <string name="movie_by_rating">Movies by rating</string>
+    <string name="favorite_movie">Favorite Movies</string>
     <string name="no_internet_error">Sorry no internet connection is available on device.
         Make sure you have proper internet connection on device.</string>
     <string name="ok_button">OK</string>

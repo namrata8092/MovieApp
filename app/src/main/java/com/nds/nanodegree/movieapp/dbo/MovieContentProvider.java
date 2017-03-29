@@ -40,7 +40,25 @@ public class MovieContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        final SQLiteDatabase movieDb = mMovieDBHelper.getReadableDatabase();
+        int match = sUriMatcher.match(uri);
+        Cursor queriedCursor;
+        switch (match){
+            case MOVIE_DETAIL_TASK :
+                queriedCursor = movieDb.query(MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            default:
+                throw new SQLiteException("Query failed "+uri);
+        }
+        queriedCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return queriedCursor;
     }
 
     @Nullable

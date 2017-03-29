@@ -4,8 +4,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +26,7 @@ import com.nds.nanodegree.movieapp.R;
 import com.nds.nanodegree.movieapp.common.Constants;
 import com.nds.nanodegree.movieapp.common.Util;
 import com.nds.nanodegree.movieapp.databinding.ActivityLauncherBinding;
+import com.nds.nanodegree.movieapp.dbo.MovieContract;
 import com.nds.nanodegree.movieapp.model.MovieModel;
 import com.nds.nanodegree.movieapp.model.MovieSearchResult;
 import com.nds.nanodegree.movieapp.services.FetchMovieData;
@@ -28,12 +35,14 @@ import com.nds.nanodegree.movieapp.views.Adapter.MoviePosterAdapter;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Namrata Shah on 2/26/2017.
  */
-public class LauncherActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
+@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+public class LauncherActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Object> {
 
     private RecyclerView mPosterRecyclerView;
     private MoviePosterAdapter mMovieAdapter;
@@ -45,6 +54,7 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
     private ActivityLauncherBinding mActivityLauncherBinding;
     private GridLayoutManager mGridLayoutManager;
     private static final int CELL_WIDTH = 150;
+    private static final int FAVORITE_MOVIE_LOADER_ID = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +76,13 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
         }else{
             fetchMovieData(mSourceContext, Constants.SEARCH_BY_POPULARITY);
         }
+        getSupportLoaderManager().initLoader(FAVORITE_MOVIE_LOADER_ID, null,this);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getSupportLoaderManager().restartLoader(FAVORITE_MOVIE_LOADER_ID, null,this);
     }
 
     /**
@@ -138,10 +154,20 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
             case R.id.byRating :
                 fetchMovieData(mSourceContext, Constants.SEARCH_BY_RATING);
                 break;
+            case R.id.byFavorite:
+                fetchFavoriteMovies();
+                break;
             default :
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    /**
+     * query database to get favorite movies
+    * */
+    private void fetchFavoriteMovies() {
+        setTitle(R.string.favorite_movie);
     }
 
     /**
@@ -188,6 +214,8 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void setGridAdapter() {
+        if(mMovieList == null)
+            return;
         mMovieAdapter = new MoviePosterAdapter(getApplicationContext(), mMovieList, this);
         mPosterRecyclerView.setAdapter(mMovieAdapter);
         mMovieAdapter.notifyDataSetChanged();
@@ -197,5 +225,72 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         MovieModel movie = mMovieList.get(position);
         displayDetailActivity(movie, mSourceContext);
+    }
+
+
+    @Override
+    public Loader<Object> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<Cursor>(this) {
+            Cursor favoriteMoviesCursor = null;
+            @Override
+            protected void onStartLoading() {
+                if(favoriteMoviesCursor != null){
+                    deliverResult(favoriteMoviesCursor);
+                }else{
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public Cursor loadInBackground() {
+                try{
+                    return getContentResolver().query(MovieContract.MovieEntry.DETAIL_URI,null, MovieContract.MovieEntry.COLUMN_NAME_MOVIE_FAVORITE, boolean, null, null, null);
+                }catch (Exception e){
+                    return null;
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Object> loader, Object data) {
+        mMovieList = getDataFromCursor((Cursor)data);
+        setGridAdapter();
+    }
+
+    private List<MovieModel> getDataFromCursor(Cursor data) {
+        List<MovieModel> models = new ArrayList<>();
+        int movieIDIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_ID);
+        int movieTitleIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_TITLE);
+        int moviePosterIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_POSTER_URL);
+        int movieBackDropIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_BACKDROP_URL);
+        int movieOverviewIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_OVERVIEW);
+        int movieReleaseDateIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_RELEASE_DATE);
+        int movieVoteAverageIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_VOTE_AVERAGE);
+
+        if(data != null && data.getCount() > 0){
+            try{
+                for(data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
+                    MovieModel model = new MovieModel(data.getString(movieIDIndex),
+                            data.getString(movieTitleIndex), data.getString(moviePosterIndex));
+                    model.setBackDropURL(data.getString(movieBackDropIndex));
+                    model.setOverview(data.getString(movieOverviewIndex));
+                    model.setReleaseDate(data.getString(movieReleaseDateIndex));
+                    model.setVoteAverage(data.getString(movieVoteAverageIndex));
+                    models.add(model);
+                }
+            }catch (Exception e){
+
+            }finally {
+                data.close();
+            }
+        }
+        return models;
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Object> loader) {
+        mMovieList = null;
+        mMovieAdapter.notifyDataSetChanged();
     }
 }
