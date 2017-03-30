@@ -39,11 +39,6 @@ public class MoviePosterAdapter extends RecyclerView.Adapter<MoviePosterAdapter.
 
         public MoviePosterViewHolder(View view){
             super(view);
-            //uncomment below lines & comment findviewbyid , grid is not populated.
-//            ViewGroup viewGroup = (ViewGroup) view.getRootView();
-//            GridCellLayoutBinding gridCellLayoutBinding = DataBindingUtil.inflate(mInflater, R.layout.grid_cell_layout, viewGroup,false);
-//            mPosterIV = gridCellLayoutBinding.moviePoster;
-//            mMovieTitleTV = gridCellLayoutBinding.movieTitle;
             mPosterIV = (ImageView) view.findViewById(R.id.moviePoster);
             mMovieTitleTV = (TextView)view.findViewById(R.id.movieTitle);
             view.setOnClickListener(this);

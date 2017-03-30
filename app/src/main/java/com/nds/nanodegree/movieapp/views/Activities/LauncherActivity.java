@@ -42,7 +42,7 @@ import java.util.List;
  * Created by Namrata Shah on 2/26/2017.
  */
 @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
-public class LauncherActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Object> {
+public class LauncherActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private RecyclerView mPosterRecyclerView;
     private MoviePosterAdapter mMovieAdapter;
@@ -76,13 +76,19 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
         }else{
             fetchMovieData(mSourceContext, Constants.SEARCH_BY_POPULARITY);
         }
-        getSupportLoaderManager().initLoader(FAVORITE_MOVIE_LOADER_ID, null,this);
+
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<Cursor> favoriteMovieLoader = loaderManager.getLoader(FAVORITE_MOVIE_LOADER_ID);
+        if(favoriteMovieLoader == null){
+            loaderManager.initLoader(FAVORITE_MOVIE_LOADER_ID, null,this);
+        }else{
+            loaderManager.restartLoader(FAVORITE_MOVIE_LOADER_ID, null,this);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportLoaderManager().restartLoader(FAVORITE_MOVIE_LOADER_ID, null,this);
     }
 
     /**
@@ -229,7 +235,7 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
 
 
     @Override
-    public Loader<Object> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<Cursor>(this) {
             Cursor favoriteMoviesCursor = null;
             @Override
@@ -241,10 +247,12 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
                 }
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public Cursor loadInBackground() {
                 try{
-                    return getContentResolver().query(MovieContract.MovieEntry.DETAIL_URI,null, MovieContract.MovieEntry.COLUMN_NAME_MOVIE_FAVORITE, boolean, null, null, null);
+                    return getContentResolver().query(MovieContract.MovieEntry.DETAIL_URI,null, MovieContract.MovieEntry.COLUMN_NAME_MOVIE_FAVORITE, null, null, null);
+//                    return getContentResolver().query(MovieContract.MovieEntry.DETAIL_URI,null, MovieContract.MovieEntry.COLUMN_NAME_MOVIE_FAVORITE, true, null, null, null);
                 }catch (Exception e){
                     return null;
                 }
@@ -253,8 +261,8 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
     }
 
     @Override
-    public void onLoadFinished(Loader<Object> loader, Object data) {
-        mMovieList = getDataFromCursor((Cursor)data);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mMovieList = getDataFromCursor(data);
         setGridAdapter();
     }
 
@@ -289,7 +297,7 @@ public class LauncherActivity extends AppCompatActivity implements AdapterView.O
     }
 
     @Override
-    public void onLoaderReset(Loader<Object> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         mMovieList = null;
         mMovieAdapter.notifyDataSetChanged();
     }

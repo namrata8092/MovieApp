@@ -18,7 +18,7 @@ public class TrailerSearchResult {
 
     @Override
     public String toString() {
-        return "TrailerSearchResult{" +
+        return "TrailerSearchResultModel{" +
                 "trailerResult=" + trailerResult +
                 '}';
     }

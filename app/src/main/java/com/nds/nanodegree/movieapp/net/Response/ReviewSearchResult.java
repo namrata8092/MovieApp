@@ -18,7 +18,7 @@ public class ReviewSearchResult {
 
     @Override
     public String toString() {
-        return "ReviewSearchResult{" +
+        return "ReviewSearchResultModel{" +
                 "reviews=" + reviews +
                 '}';
     }

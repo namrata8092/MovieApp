@@ -62,4 +62,14 @@
         <item name="android:layout_height">@dimen/favorite_icon_height</item>
         <item name="android:background">@mipmap/ic_launcher</item>
     </style>
+
+    <style name="reviewAuthor" parent="Title">
+        <item name="android:textSize">@dimen/font_medium</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="reviewContent" parent="Title">
+        <item name="android:textSize">@dimen/font_small</item>
+        <item name="android:textColor">@color/darkGray</item>
+    </style>
 </resources>
