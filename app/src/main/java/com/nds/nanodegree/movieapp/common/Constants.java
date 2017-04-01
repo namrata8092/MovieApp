@@ -20,5 +20,6 @@ public final class Constants {
     public static final String SELECTED_MOVIE_DETAIL_BUNDLE_KEY="selectedMovieDetail";
     public static final int SEARCH_BY_POPULARITY=0;
     public static final int SEARCH_BY_RATING=1;
+    public static final int SEARCH_BY_FAVORITE=2;
 }
 
