@@ -3,6 +3,7 @@ package com.nds.nanodegree.movieapp.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*Movie model class
@@ -116,7 +117,11 @@ public class MovieModel implements Parcelable {
         originalTitle = in.readString();
         voteAverage = in.readString();
         favorite = in.readByte() != 0;
+        if(reviews == null)
+            reviews = new ArrayList<>();
         in.readTypedList(reviews, ReviewModel.CREATOR);
+        if(trailers == null)
+            trailers = new ArrayList<>();
         in.readTypedList(trailers, TrailerModel.CREATOR);
 
     }

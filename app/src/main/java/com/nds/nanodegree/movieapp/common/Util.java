@@ -105,7 +105,7 @@ public final class Util {
      * Builds movie search URL based on selection.
      * @return search URL as string
      */
-    public static String buildMovieSearchURL(int selection){
+    public static String buildMovieURL(int selection){
         switch(selection){
             case Constants.SEARCH_BY_POPULARITY :
                 Uri popularUri = Uri.parse(Constants.MOVIE_SEARCH_BY_POPULAR).buildUpon().
@@ -115,6 +115,32 @@ public final class Util {
                 Uri ratingUri = Uri.parse(Constants.MOVIE_SEARCH_BY_TOP_RATED).buildUpon().
                         appendQueryParameter(Constants.QUERY_PARAM_API_KEY, Constants.API_KEY).build();
                 return ratingUri.toString();
+            default:
+                break;
+        }
+        return null;
+    }
+
+    /**
+     * Builds movie search URL based on selection.
+     * @return search URL as string
+     */
+    public static String buildMovieURL(int selection, String movieID){
+        switch(selection){
+            case Constants.TRAILER_URL :
+                Uri.Builder trailerUri = Uri.parse(Constants.MOVIE_BASE_URL).buildUpon();
+                trailerUri.appendPath(Constants.MOVIE_KEY).
+                        appendPath(String.valueOf(movieID)).
+                        appendPath(Constants.VIDEO_KEY).
+                        appendQueryParameter(Constants.QUERY_PARAM_API_KEY, Constants.API_KEY).build();
+                return trailerUri.toString();
+            case Constants.REVIEW_URL :
+                Uri.Builder reviewUri = Uri.parse(Constants.MOVIE_BASE_URL).buildUpon();
+                reviewUri.appendPath(Constants.MOVIE_KEY).
+                        appendPath(String.valueOf(movieID)).
+                        appendPath(Constants.REVIEW_KEY).
+                        appendQueryParameter(Constants.QUERY_PARAM_API_KEY, Constants.API_KEY).build();
+                return reviewUri.toString();
         }
         return null;
     }

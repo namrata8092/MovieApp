@@ -3,7 +3,7 @@ package com.nds.nanodegree.movieapp.Converter;
 import com.nds.nanodegree.movieapp.common.JSONSerializeHelper;
 import com.nds.nanodegree.movieapp.model.TrailerModel;
 import com.nds.nanodegree.movieapp.model.TrailerSearchResultModel;
-import com.nds.nanodegree.movieapp.net.Response.TrailerSearchResult;
+import com.nds.nanodegree.movieapp.net.Response.MovieTrailerResult;
 import com.nds.nanodegree.movieapp.net.tos.MovieTrailers;
 
 import java.util.ArrayList;
@@ -18,9 +18,9 @@ public final class MovieTrailerConverter {
     }
 
     public static TrailerSearchResultModel getMovieTrailerModel(String trailerResult) {
-        TrailerSearchResult result = JSONSerializeHelper.deserializeObject(TrailerSearchResult.class, trailerResult);
-        if (result.getTrailerResult() != null) {
-            TrailerSearchResultModel searchResult = new TrailerSearchResultModel(toModel(result.getTrailerResult().getResults()));
+        MovieTrailerResult result = JSONSerializeHelper.deserializeObject(MovieTrailerResult.class, trailerResult);
+        if (result.getResults() != null) {
+            TrailerSearchResultModel searchResult = new TrailerSearchResultModel(toModel(result.getResults()));
             return searchResult;
         } else
             return null;

@@ -3,7 +3,7 @@ package com.nds.nanodegree.movieapp.Converter;
 import com.nds.nanodegree.movieapp.common.JSONSerializeHelper;
 import com.nds.nanodegree.movieapp.model.ReviewModel;
 import com.nds.nanodegree.movieapp.model.ReviewSearchResultModel;
-import com.nds.nanodegree.movieapp.net.Response.ReviewSearchResult;
+import com.nds.nanodegree.movieapp.net.Response.MovieReviews;
 import com.nds.nanodegree.movieapp.net.tos.MovieReviewResult;
 
 import java.util.ArrayList;
@@ -18,9 +18,9 @@ public final class MovieReviewConverter {
     public MovieReviewConverter(){}
 
     public static ReviewSearchResultModel getMovieReviewModel(String reviewResult){
-        ReviewSearchResult result = JSONSerializeHelper.deserializeObject(ReviewSearchResult.class, reviewResult);
-        if(result.getReviews() != null){
-            ReviewSearchResultModel searchResult = new ReviewSearchResultModel(toModel(result.getReviews().getResults()));
+        MovieReviews result = JSONSerializeHelper.deserializeObject(MovieReviews.class, reviewResult);
+        if(result.getResults() != null){
+            ReviewSearchResultModel searchResult = new ReviewSearchResultModel(toModel(result.getResults()));
             return searchResult;
         }else
             return null;

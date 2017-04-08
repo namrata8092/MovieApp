@@ -13,7 +13,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "movie.db";
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
 
     public MovieDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -22,15 +22,15 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_TABLE= "CREATE TABLE "+ MovieContract.MovieEntry.TABLE_NAME+
-                " ("+ MovieContract.MovieEntry._ID+"INTEGER PRIMARY KEY AS INTEGER,"
+                " ("+ MovieContract.MovieEntry._ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_TITLE+" TEXT NOT NULL, "
+                + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_ORIGINAL_TITLE+" TEXT NOT NULL, "
                 + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_POSTER_URL+" TEXT NOT NULL,"
                 + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_BACKDROP_URL+" TEXT NOT NULL,"
                 + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_OVERVIEW+" TEXT NOT NULL, "
                 + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_RELEASE_DATE+" TEXT NOT NULL, "
                 + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_VOTE_AVERAGE+" TEXT NOT NULL, "
-                + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_ID+" INTEGER NOT NULL, "
-            + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_FAVORITE+" BOOLEAN "+");";
+                + MovieContract.MovieEntry.COLUMN_NAME_MOVIE_ID+" INTEGER NOT NULL "+");";
         db.execSQL(SQL_CREATE_TABLE);
     }
 
