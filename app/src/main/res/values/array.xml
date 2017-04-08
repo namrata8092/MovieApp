@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="preference_options_key">
+        <item>0</item>
+        <item>@string/preference_top_rated_movie_key</item>
+        <item>@string/preference_favorite_movie_key</item>
+    </string-array>
+
+    <string-array name="preference_options_value">
+        <item>@string/preference_popular_movie_value</item>
+        <item>@string/preference_top_rated_movie_value</item>
+        <item>@string/preference_favorite_movie_value</item>
+    </string-array>
+
+</resources>

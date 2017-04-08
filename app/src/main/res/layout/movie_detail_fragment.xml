@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tool="http://schemas.android.com/tools">
+    xmlns:tool="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/apk/res-auto">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -28,27 +29,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true" />
+                    android:layout_centerVertical="true"/>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/movieThumbnail"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:id="@+id/movieDetail">
 
                     <TextView
                         android:id="@+id/releaseDate"
-                        style="@style/Title" />
+                        style="@style/SubTitle"/>
 
                     <TextView
                         android:id="@+id/averageRating"
-                        style="@style/SubTitle" />
+                        style="@style/SubTitle"/>
 
-                    <ImageView android:id="@+id/favoriteIcon"
-                        style="@style/favorite"
-                        android:onClick="saveFavorite"/>
+                    <TextView
+                        android:id="@+id/addToFavorite"
+                        style="@style/SubTitle"
+                        android:text="@string/add_to_favorite"
+                        android:drawableRight="@mipmap/favorite_disable"/>
 
                 </LinearLayout>
+
             </RelativeLayout>
 
             <View
@@ -62,29 +67,25 @@
                 style="@style/Overview" />
 
             <TextView android:id="@+id/trailer"
-                style="@style/SubTitle"
-                android:drawableLeft="@mipmap/ic_launcher"
+                style="@style/Title"
+                android:drawableLeft="@mipmap/trailer"
+                android:drawablePadding="5dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                tool:text="Trailer"
-                android:onClick="fetchTrailer"/>
+                android:text="@string/trailer"/>
 
-            <android.support.v7.widget.RecyclerView android:id="@+id/trailerList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"></android.support.v7.widget.RecyclerView>
 
             <TextView android:id="@+id/review"
-                style="@style/SubTitle"
-                android:drawableLeft="@mipmap/ic_launcher"
+                style="@style/Title"
+                android:drawableLeft="@mipmap/review"
+                android:drawablePadding="5dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                tool:text="Review"
-                android:onClick="fetchReview"/>
+                android:text="@string/review"/>
 
             <android.support.v7.widget.RecyclerView android:id="@+id/reviewList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:visibility="gone"></android.support.v7.widget.RecyclerView>
         </LinearLayout>
     </ScrollView>

@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".views.Activities.LauncherActivity">
+        <activity android:name=".views.Activities.LauncherActivity"  android:configChanges="orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -20,11 +20,14 @@
 
         <activity android:name=".views.Activities.MovieDetailActivity"
             android:parentActivityName=".views.Activities.LauncherActivity"
-            android:label="@string/detail_activity_title"/>
+            android:label="@string/detail_activity_title" android:configChanges="orientation"/>
 
         <provider android:name=".dbo.MovieContentProvider"
             android:authorities="com.nds.nanodegree.movieapp"
              android:exported="false"/>
+
+        <activity android:name=".views.Activities.MovieSettingsActivity" android:configChanges="orientation"/>
+
     </application>
 
 </manifest>
