@@ -1,6 +1,7 @@
-package com.nds.nanodegree.movieapp.net.tos;
+package com.nds.nanodegree.movieapp.net.Response;
 
 import com.google.gson.annotations.SerializedName;
+import com.nds.nanodegree.movieapp.net.tos.MovieReviewResult;
 
 import java.util.List;
 
