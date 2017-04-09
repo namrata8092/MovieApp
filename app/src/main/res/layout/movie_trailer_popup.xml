@@ -2,8 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent" android:background="#ffffff">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/trailer_popup_title"
+        style="@style/trailerTitle"
+        />
 <ListView android:id="@+id/trailerList"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:divider="@color/darkGray"></ListView>
+    android:divider="@color/darkGray"
+    android:dividerHeight="1.5dp"></ListView>
 </LinearLayout>

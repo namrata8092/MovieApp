@@ -11,6 +11,7 @@
     <string name="average_rating">Average Rating :</string>
     <string name="no_api_key">Please enter API key and run application again.</string>
     <string name="trailer">Trailer</string>
+    <string name="trailer_popup_title">Select Trailer</string>
     <string name="review">Review</string>
     <string name="add_to_favorite">Add to favorite</string>
     <string name="settings">Settings</string>
@@ -23,11 +24,13 @@
     <string name="preference_popular_movie_key">popular_movie</string>
     <string name="preference_popular_movie_value">Popular Movies</string>
 
-
     <string name="preference_top_rated_movie_key">top_rated</string>
     <string name="preference_top_rated_movie_value">Top Rated Movies</string>
 
     <string name="preference_favorite_movie_key">favorite_movie</string>
     <string name="preference_favorite_movie_value">Favorite Movies</string>
 
+    <string name="no_trailer">Sorry no trailer found for %1$s.</string>
+    <string name="no_review">Sorry no review found for %1$s.</string>
+    <string name="no_favorite">There is no favorite selected as favorite.</string>
 </resources>

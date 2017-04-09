@@ -38,7 +38,10 @@ public final class Constants {
     public static final String REVIEW_KEY="reviews";
     public static final String VIDEO_KEY="videos";
 
+    public static final int PORTRAIT_NO_OF_CELLS = 2;
+    public static final int LANDSCAPE_NO_OF_CELLS = 3;
 
+    public static final int DISPLAY_DETAIL_FRAGMENT = 0;
 }
 
 

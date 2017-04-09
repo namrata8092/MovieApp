@@ -77,4 +77,14 @@
         <item name="android:textSize">@dimen/font_small</item>
         <item name="android:textColor">@color/darkGray</item>
     </style>
+
+    <style name="trailerTitle" parent="Title">
+        <item name="android:textSize">@dimen/font_medium</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="trailerItem" parent="trailerTitle">
+        <item name="android:textColor">@color/darkGray</item>
+        <item name="android:padding">15dp</item>
+    </style>
 </resources>

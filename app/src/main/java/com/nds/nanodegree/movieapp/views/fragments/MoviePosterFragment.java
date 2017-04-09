@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -34,39 +37,39 @@ import com.nds.nanodegree.movieapp.common.Util;
 import com.nds.nanodegree.movieapp.dbo.MovieContract;
 import com.nds.nanodegree.movieapp.model.MovieModel;
 import com.nds.nanodegree.movieapp.model.MovieSearchResult;
-import com.nds.nanodegree.movieapp.services.FetchMovieData;
 import com.nds.nanodegree.movieapp.views.Activities.MovieDetailActivity;
 import com.nds.nanodegree.movieapp.views.Adapter.MovieItemDecoration;
 import com.nds.nanodegree.movieapp.views.Adapter.MoviePosterAdapter;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-/**MoviePosterFragment will display Movie Name & movie poster based on selection.
+/**
+ * MoviePosterFragment will display Movie Name & movie poster based on selection.
  * Created by Namrata Shah on 4/2/2017.
  */
 
-public class MoviePosterFragment extends Fragment implements AdapterView.OnItemClickListener{
-        private RecyclerView mPosterRecyclerView;
-        private MoviePosterAdapter mMovieAdapter;
-        private MovieSearchResult movieSearchResult;
-        private List<MovieModel> mMovieList;
-        private Context mSourceContext;
-        private ProgressBar mMovieDataFetchProgressBar;
-        private AlertDialog alertDialog;
-        private GridLayoutManager mGridLayoutManager;
-        private static final int CELL_WIDTH = 150;
-        private static final int SEARCH_MOVIE_LOADER_ID = 10;
-        private static final int FAVORITE_MOVIE_LOADER_ID = 20;
-        private static final String URL_KEY = "url";
-        LoaderManager.LoaderCallbacks<String> mMovieSearchLoaderListener;
-        LoaderManager.LoaderCallbacks<Cursor> mFavoriteMovieFromDBLoaderListener;
-        private boolean mTwoPanelLayout = false;
-        private SharedPreferences mMoviePreferences;
-        private String mMovieSortChoice;
+public class MoviePosterFragment extends Fragment implements AdapterView.OnItemClickListener {
+    private RecyclerView mPosterRecyclerView;
+    private MoviePosterAdapter mMovieAdapter;
+    private MovieSearchResult movieSearchResult;
+    private List<MovieModel> mMovieList;
+    private Context mSourceContext;
+    private ProgressBar mMovieDataFetchProgressBar;
+    private AlertDialog alertDialog;
+    private GridLayoutManager mGridLayoutManager;
+    private static final int CELL_WIDTH = 150;
+    private static final int SEARCH_MOVIE_LOADER_ID = 10;
+    private static final int FAVORITE_MOVIE_LOADER_ID = 20;
+    private static final String URL_KEY = "url";
+    LoaderManager.LoaderCallbacks<String> mMovieSearchLoaderListener;
+    LoaderManager.LoaderCallbacks<Cursor> mFavoriteMovieFromDBLoaderListener;
+    private boolean mTwoPanelLayout = false;
+    private SharedPreferences mMoviePreferences;
+    private String mMovieSortChoice;
+    private Handler mHandler;
 
     private static final String[] FAV_MOVIE_COLUMNS = {
             MovieContract.MovieEntry._ID,
@@ -87,6 +90,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
         return fragment;
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -95,13 +99,18 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
         mPosterRecyclerView = (RecyclerView) view.findViewById(R.id.moviePosterGrid);
         mMovieDataFetchProgressBar = (ProgressBar) view.findViewById(R.id.movieFetchProgress);
 
-        mGridLayoutManager = new GridLayoutManager(mSourceContext, Util.calculateNoOfColumns(mSourceContext, CELL_WIDTH));
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mGridLayoutManager = new GridLayoutManager(mSourceContext, Constants.PORTRAIT_NO_OF_CELLS);
+        } else {
+            mGridLayoutManager = new GridLayoutManager(mSourceContext, Constants.LANDSCAPE_NO_OF_CELLS);
+        }
+
         mPosterRecyclerView.setLayoutManager(mGridLayoutManager);
 
-        MovieItemDecoration itemDecoration = new MovieItemDecoration((int)getResources().getDimension(R.dimen.grid_offset));
+        MovieItemDecoration itemDecoration = new MovieItemDecoration((int) getResources().getDimension(R.dimen.grid_offset));
         mPosterRecyclerView.addItemDecoration(itemDecoration);
 
-        if(getActivity().findViewById(R.id.movieDetailContainer) != null){
+        if (getActivity().findViewById(R.id.movieDetailContainer) != null) {
             mTwoPanelLayout = true;
         }
         return view;
@@ -113,32 +122,41 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
         super.onCreate(savedInstanceState);
         mSourceContext = getActivity().getApplicationContext();
         mMoviePreferences = PreferenceManager.getDefaultSharedPreferences(mSourceContext);
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what == Constants.DISPLAY_DETAIL_FRAGMENT) {
+                    displayDetailFragment(mMovieList.get(0));
+                }
+            }
+        };
 
         mMovieSearchLoaderListener = new LoaderManager.LoaderCallbacks<String>() {
             @Override
             public Loader<String> onCreateLoader(int id, final Bundle args) {
                 return new AsyncTaskLoader<String>(mSourceContext) {
                     private String mData = null;
+
                     @Override
                     protected void onStartLoading() {
                         super.onStartLoading();
-                        if(args == null || args.isEmpty())
+                        if (args == null || args.isEmpty())
                             return;
                         displayProgressBar();
-                        if(mData == null)
+                        if (mData == null)
                             forceLoad();
                     }
 
                     @Override
                     public String loadInBackground() {
-                        try{
+                        try {
                             final String url = args.getString(URL_KEY);
-                            if(url == null || TextUtils.isEmpty(url))
+                            if (url == null || TextUtils.isEmpty(url))
                                 return null;
                             String movieSearchResult = Util.getResponseFromHttpURL(new URL(url));
                             mData = movieSearchResult;
                             return movieSearchResult;
-                        }catch(IOException e){
+                        } catch (IOException e) {
                             return null;
                         }
                     }
@@ -147,14 +165,14 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
             @Override
             public void onLoadFinished(Loader<String> loader, String data) {
-                if(data != null){
+                if (data != null) {
                     MovieSearchResult searchResult = MovieSearchConverter.getMovieSearchModel(data);
-                    if(searchResult != null && !searchResult.equals("")){
+                    if (searchResult != null && !searchResult.equals("")) {
                         mMovieList = searchResult.getMovieList();
                         setGridAdapter();
                     }
-                }else{
-                    Toast.makeText(mSourceContext,"No Data fetch from loader", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(mSourceContext, "No Data fetch from loader", Toast.LENGTH_SHORT).show();
                 }
                 hideProgressBar();
             }
@@ -171,12 +189,13 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
                 return new AsyncTaskLoader<Cursor>(mSourceContext) {
                     Cursor favoriteMoviesCursor = null;
+
                     @Override
                     protected void onStartLoading() {
                         displayProgressBar();
-                        if(favoriteMoviesCursor != null){
+                        if (favoriteMoviesCursor != null) {
                             deliverResult(favoriteMoviesCursor);
-                        }else{
+                        } else {
                             forceLoad();
                         }
                     }
@@ -184,9 +203,9 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                     @Override
                     public Cursor loadInBackground() {
-                        try{
-                            return mSourceContext.getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,FAV_MOVIE_COLUMNS, null, null, null);
-                        }catch (Exception e){
+                        try {
+                            return mSourceContext.getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, FAV_MOVIE_COLUMNS, null, null, null);
+                        } catch (Exception e) {
                             return null;
                         }
                     }
@@ -196,8 +215,12 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
             @Override
             public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
                 mMovieList = getDataFromCursor(data);
-                setGridAdapter();
                 hideProgressBar();
+                if(mMovieList.size() == 0){
+                    Util.createToastMsg(getActivity(),getString(R.string.no_favorite));
+                    return;
+                }
+                setGridAdapter();
             }
 
             @Override
@@ -207,11 +230,11 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
             }
         };
 
-        if(savedInstanceState == null || !savedInstanceState.containsKey(Constants.MOVIE_SORT_CHOICE_BUNDLE_KEY) || mMovieList == null){
-            mMovieSortChoice = mMoviePreferences.getString(getString(R.string.movie_pref_sort_key),"");
+        if (savedInstanceState == null || !savedInstanceState.containsKey(Constants.MOVIE_SORT_CHOICE_BUNDLE_KEY) || mMovieList == null) {
+            mMovieSortChoice = mMoviePreferences.getString(getString(R.string.movie_pref_sort_key), "");
             mMovieList = new ArrayList<>();
             refreshMovieListWithNewChoice(mMovieSortChoice, true);
-        }else{
+        } else {
             mMovieSortChoice = savedInstanceState.getString(Constants.MOVIE_SORT_CHOICE_BUNDLE_KEY);
             mMovieList = savedInstanceState.getParcelableArrayList(Constants.MOVIE_LIST_BUNDLE_KEY);
 
@@ -222,8 +245,8 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onResume() {
         super.onResume();
-        String savedMoviePreference = mMoviePreferences.getString(getString(R.string.movie_pref_sort_key),"");
-        if(!mMovieSortChoice.equals(savedMoviePreference) || mMovieList == null ){
+        String savedMoviePreference = mMoviePreferences.getString(getString(R.string.movie_pref_sort_key), "");
+        if (!mMovieSortChoice.equals(savedMoviePreference) || mMovieList == null) {
             mMovieSortChoice = savedMoviePreference;
             refreshMovieListWithNewChoice(mMovieSortChoice, true);
         }
@@ -239,9 +262,9 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
     }
 
     private void refreshMovieListWithNewChoice(String mMovieSearchPreference, boolean fetchMovies) {
-        if(fetchMovies){
+        if (fetchMovies) {
             int choice = identifySearchTypeFromPreference(mMovieSearchPreference);
-            switch(choice) {
+            switch (choice) {
                 case Constants.SEARCH_BY_POPULARITY:
                 case Constants.SEARCH_BY_RATING:
                     fetchMovieDataUsingLoader(mMovieSearchLoaderListener, choice);
@@ -251,16 +274,16 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                     break;
                 default:
             }
-        }else{
+        } else {
             return;
         }
 
     }
 
-    private int identifySearchTypeFromPreference(String preference){
-        if(preference.equals(getString(R.string.preference_top_rated_movie_key)))
+    private int identifySearchTypeFromPreference(String preference) {
+        if (preference.equals(getString(R.string.preference_top_rated_movie_key)))
             return Constants.SEARCH_BY_RATING;
-        else if(preference.equals(getString(R.string.preference_favorite_movie_key)))
+        else if (preference.equals(getString(R.string.preference_favorite_movie_key)))
             return Constants.SEARCH_BY_FAVORITE;
         else
             return Constants.SEARCH_BY_POPULARITY;
@@ -285,34 +308,35 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
      * This method will fetch movie data using TMDB API & updated adapter data.
      * It accepts URL as input.
      * If there no internet connection it will show alertdialog.
+     *
      * @param URL
      */
 
     private void fetchMovieDataUsingLoader(LoaderManager.LoaderCallbacks<String> movieSearchLoaderListener, int searchBy) {
-        if(Util.isAPIKeyMissing(Constants.API_KEY)){
+        if (Util.isAPIKeyMissing(Constants.API_KEY)) {
             displayAlertDialog(mSourceContext, getResources().getString(R.string.no_api_key));
-        }else if(!Util.isNetworkAvailable(mSourceContext)){
+        } else if (!Util.isNetworkAvailable(mSourceContext)) {
             displayAlertDialog(mSourceContext, getResources().getString(R.string.no_internet_error));
-        }else{
+        } else {
             LoaderManager loaderManager = getLoaderManager();
             Loader<String> movieSearchLoader = loaderManager.getLoader(SEARCH_MOVIE_LOADER_ID);
             Bundle bundle = new Bundle();
-            bundle.putString(URL_KEY,Util.buildMovieURL(searchBy));
+            bundle.putString(URL_KEY, Util.buildMovieURL(searchBy));
 
-            if(movieSearchLoader == null){
-                loaderManager.initLoader(SEARCH_MOVIE_LOADER_ID, bundle,movieSearchLoaderListener);
-            }else{
-                loaderManager.restartLoader(SEARCH_MOVIE_LOADER_ID, bundle,movieSearchLoaderListener);
+            if (movieSearchLoader == null) {
+                loaderManager.initLoader(SEARCH_MOVIE_LOADER_ID, bundle, movieSearchLoaderListener);
+            } else {
+                loaderManager.restartLoader(SEARCH_MOVIE_LOADER_ID, bundle, movieSearchLoaderListener);
             }
 
-            switch(searchBy){
-                case Constants.SEARCH_BY_POPULARITY :
+            switch (searchBy) {
+                case Constants.SEARCH_BY_POPULARITY:
                     getActivity().setTitle(R.string.popular_movie);
                     break;
-                case Constants.SEARCH_BY_RATING :
+                case Constants.SEARCH_BY_RATING:
                     getActivity().setTitle(R.string.movie_by_rating);
                     break;
-                default :
+                default:
             }
         }
     }
@@ -321,7 +345,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(alertDialog != null){
+        if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;
         }
@@ -330,19 +354,17 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
     /**
      * This method will display movie detail page.
      * For selected movie, details are passed from current activity.
+     *
      * @param movie
      * @param sourceContext
      */
     private void displayDetailActivity(MovieModel movie, Context sourceContext, boolean mTwoPanelLayout) {
-        if(mTwoPanelLayout){
-            MovieDetailFragment detailFragment = MovieDetailFragment.newInstance(movie);
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            fragmentManager.beginTransaction().add(R.id.movieDetailContainer,
-                    detailFragment, Constants.MOVIE_DETAIL_FRAGMENT_TAG).commit();
-        }else{
+        if (mTwoPanelLayout)
+            displayDetailFragment(movie);
+        else{
             Class destinationClass = MovieDetailActivity.class;
             Intent movieDetailActivity = new Intent(sourceContext, destinationClass);
-            movieDetailActivity.putExtra(Constants.SELECTED_MOVIE_DETAIL_BUNDLE_KEY,movie);
+            movieDetailActivity.putExtra(Constants.SELECTED_MOVIE_DETAIL_BUNDLE_KEY, movie);
             startActivity(movieDetailActivity);
         }
     }
@@ -350,23 +372,24 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
     /**
      * query database to get favorite movies
-     * */
+     */
     private void fetchFavoriteMovies() {
         getActivity().setTitle(R.string.favorite_movie);
         LoaderManager loaderManager = getLoaderManager();
         Loader<Cursor> favoriteMovieLoader = loaderManager.getLoader(FAVORITE_MOVIE_LOADER_ID);
-        if(favoriteMovieLoader == null){
+        if (favoriteMovieLoader == null) {
             loaderManager.initLoader(FAVORITE_MOVIE_LOADER_ID, null, mFavoriteMovieFromDBLoaderListener);
-        }else{
+        } else {
             loaderManager.restartLoader(FAVORITE_MOVIE_LOADER_ID, null, mFavoriteMovieFromDBLoaderListener);
         }
     }
 
     /**
      * Display alert dialog when API KEY is not present.
+     *
      * @param mSourceContext
      */
-    private void displayAlertDialog(Context mSourceContext, String msg){
+    private void displayAlertDialog(Context mSourceContext, String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mSourceContext).setCancelable(false)
                 .setMessage(msg).setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
                     @Override
@@ -379,32 +402,22 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
     }
 
 
-    private void fetchMovieDataFor(String URL){
-        if(Util.isNetworkAvailable(mSourceContext)){
-            try {
-                FetchMovieData fetchData = new FetchMovieData(mMovieDataFetchProgressBar,
-                        new URL(URL), new FetchMovieData.MovieResponse() {
-                    @Override
-                    public void getMovieSearchResults(MovieSearchResult result) {
-                        movieSearchResult = result;
-                        mMovieList = result.getMovieList();
-                        setGridAdapter();
-                    }
-                });
-                fetchData.execute();
-            } catch (MalformedURLException e) {
-            }
-        }else{
-            displayAlertDialog(mSourceContext, getResources().getString(R.string.no_internet_error));
-        }
-    }
-
     private void setGridAdapter() {
-        if(mMovieList == null)
+        if (mMovieList == null)
             return;
         mMovieAdapter = new MoviePosterAdapter(mSourceContext, mMovieList, this);
         mPosterRecyclerView.setAdapter(mMovieAdapter);
         mMovieAdapter.notifyDataSetChanged();
+        if (mTwoPanelLayout)
+            mHandler.sendEmptyMessage(Constants.DISPLAY_DETAIL_FRAGMENT);
+    }
+
+    private void displayDetailFragment(MovieModel movieModel) {
+        MovieDetailFragment detailFragment = MovieDetailFragment.newInstance(movieModel);
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.movieDetailContainer,
+                detailFragment, Constants.MOVIE_DETAIL_FRAGMENT_TAG).commit();
+
     }
 
     @Override
@@ -424,9 +437,9 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
         int movieReleaseDateIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_RELEASE_DATE);
         int movieVoteAverageIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_VOTE_AVERAGE);
 
-        if(data != null && data.getCount() > 0){
-            try{
-                for(data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
+        if (data != null && data.getCount() > 0) {
+            try {
+                for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
                     MovieModel model = new MovieModel(data.getString(movieIDIndex),
                             data.getString(movieTitleIndex), data.getString(moviePosterIndex));
                     model.setOriginalTitle(data.getString(movieOriginalTitleIndex));
@@ -436,9 +449,9 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                     model.setVoteAverage(data.getString(movieVoteAverageIndex));
                     models.add(model);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
 
-            }finally {
+            } finally {
                 data.close();
             }
         }

@@ -106,6 +106,11 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            Bundle arg = getArguments();
+            movieModel = arg.getParcelable(Constants.SELECTED_MOVIE_DETAIL_BUNDLE_KEY);
+        }
+
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         if (savedInstanceState != null && savedInstanceState.containsKey(Constants.SELECTED_MOVIE_DETAIL_BUNDLE_KEY)) {
             movieModel = savedInstanceState.getParcelable(Constants.SELECTED_MOVIE_DETAIL_BUNDLE_KEY);
@@ -201,6 +206,10 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
     }
 
     private void setMovieReviews(List<ReviewModel> reviews) {
+        if(reviews == null || reviews.size() == 0){
+            Util.createToastMsg(getActivity(),getString(R.string.no_review, movieModel.getTitle()));
+            return;
+        }
         mReviewRecyclerView.setVisibility(View.VISIBLE);
         mReviewRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mReviewRecyclerView.setHasFixedSize(true);
@@ -209,16 +218,20 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
     }
 
     private void setMovieTrailerList(final List<TrailerModel> result) {
-
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        if(result == null || result.size() == 0){
+            Util.createToastMsg(getActivity(),getString(R.string.no_trailer, movieModel.getTitle()));
+            return;
+        }
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View convertView = (View) inflater.inflate(R.layout.movie_trailer_popup, null);
         alertDialog.setView(convertView);
-
+        final AlertDialog dialog = alertDialog.create();
         ListView trailerListView = (ListView) convertView.findViewById(R.id.trailerList);
 
         MovieTrailerAdapter adapter = new MovieTrailerAdapter(getContext(), R.layout.trailer_list_row, result);
         trailerListView.setAdapter(adapter);
+
         trailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -228,12 +241,13 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
                 showTrailerIntent.setData(Uri.parse(Constants.YOUTUBE_BASE_URL + model.getTrailerKey()));
                 try {
                     startActivity(showTrailerIntent);
+                    dialog.cancel();
                 } catch (ActivityNotFoundException e) {
                     startActivity(showTrailerIntent);
                 }
             }
         });
 
-        alertDialog.show();
+        dialog.show();
     }
 }

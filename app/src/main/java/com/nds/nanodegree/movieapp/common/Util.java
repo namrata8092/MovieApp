@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -177,4 +178,8 @@ public final class Util {
         return (int) deviceWidth/CELL_WIDTH;
     }
 
+    public static void createToastMsg(Context cnt, String msg){
+        if(cnt != null)
+        Toast.makeText(cnt, msg, Toast.LENGTH_SHORT).show();
+    }
 }
