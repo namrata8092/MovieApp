@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceScreen;
 
 import com.nds.nanodegree.movieapp.R;
 
-/** MovieSettingsFragment will display different options to populate movies.
+/**
+ * MovieSettingsFragment will display different options to populate movies.
  * Available options are
  * 1. By popular
  * 2. By top rate
@@ -19,11 +21,20 @@ import com.nds.nanodegree.movieapp.R;
 public class MovieSettingsFragment extends PreferenceFragmentCompat implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public MovieSettingsFragment(){}
+    public MovieSettingsFragment() {
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.movie_preferences);
+        SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
+        PreferenceScreen prefScreen = getPreferenceScreen();
+        int count = prefScreen.getPreferenceCount();
+        for (int i = 0; i < count; i++) {
+            Preference p = prefScreen.getPreference(i);
+            String value = sharedPreferences.getString(p.getKey(), "");
+            setPreferenceSummary(p, value);
+        }
     }
 
     private void setPreferenceSummary(Preference preference, Object value) {

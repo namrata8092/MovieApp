@@ -32,5 +32,5 @@
 
     <string name="no_trailer">Sorry no trailer found for %1$s.</string>
     <string name="no_review">Sorry no review found for %1$s.</string>
-    <string name="no_favorite">There is no favorite selected as favorite.</string>
+    <string name="no_favorite">There is no movie selected as favorite.</string>
 </resources>

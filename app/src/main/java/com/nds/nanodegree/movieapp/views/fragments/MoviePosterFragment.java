@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nds.nanodegree.movieapp.Converter.MovieSearchConverter;
@@ -70,6 +71,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
     private SharedPreferences mMoviePreferences;
     private String mMovieSortChoice;
     private Handler mHandler;
+    private TextView mNoFavoriteMovieTextView;
 
     private static final String[] FAV_MOVIE_COLUMNS = {
             MovieContract.MovieEntry._ID,
@@ -98,7 +100,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
         mPosterRecyclerView = (RecyclerView) view.findViewById(R.id.moviePosterGrid);
         mMovieDataFetchProgressBar = (ProgressBar) view.findViewById(R.id.movieFetchProgress);
-
+        mNoFavoriteMovieTextView = (TextView)view.findViewById(R.id.noFavoriteMovieTextView);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             mGridLayoutManager = new GridLayoutManager(mSourceContext, Constants.PORTRAIT_NO_OF_CELLS);
         } else {
@@ -157,6 +159,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                             mData = movieSearchResult;
                             return movieSearchResult;
                         } catch (IOException e) {
+                            hideProgressBar();
                             return null;
                         }
                     }
@@ -165,6 +168,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
             @Override
             public void onLoadFinished(Loader<String> loader, String data) {
+                hideProgressBar();
                 if (data != null) {
                     MovieSearchResult searchResult = MovieSearchConverter.getMovieSearchModel(data);
                     if (searchResult != null && !searchResult.equals("")) {
@@ -174,7 +178,6 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                 } else {
                     Toast.makeText(mSourceContext, "No Data fetch from loader", Toast.LENGTH_SHORT).show();
                 }
-                hideProgressBar();
             }
 
             @Override
@@ -206,6 +209,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                         try {
                             return mSourceContext.getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, FAV_MOVIE_COLUMNS, null, null, null);
                         } catch (Exception e) {
+                            hideProgressBar();
                             return null;
                         }
                     }
@@ -217,7 +221,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                 mMovieList = getDataFromCursor(data);
                 hideProgressBar();
                 if(mMovieList.size() == 0){
-                    Util.createToastMsg(getActivity(),getString(R.string.no_favorite));
+                    showNoFavoriteMovieScreen();
                     return;
                 }
                 setGridAdapter();
@@ -242,6 +246,20 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
     }
 
+    private void showNoFavoriteMovieScreen() {
+        mPosterRecyclerView.setVisibility(View.GONE);
+        mNoFavoriteMovieTextView.setVisibility(View.VISIBLE);
+    }
+
+    private boolean requireToCleanNoMovie(){
+        return mPosterRecyclerView.getVisibility() == View.GONE && mNoFavoriteMovieTextView.getVisibility() == View.VISIBLE;
+    }
+
+    private void removeNoFavoriteMovieScreen() {
+        mPosterRecyclerView.setVisibility(View.VISIBLE);
+        mNoFavoriteMovieTextView.setVisibility(View.GONE);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -264,6 +282,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
     private void refreshMovieListWithNewChoice(String mMovieSearchPreference, boolean fetchMovies) {
         if (fetchMovies) {
             int choice = identifySearchTypeFromPreference(mMovieSearchPreference);
+            setTitle(choice);
             switch (choice) {
                 case Constants.SEARCH_BY_POPULARITY:
                 case Constants.SEARCH_BY_RATING:
@@ -289,6 +308,20 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
             return Constants.SEARCH_BY_POPULARITY;
     }
 
+    private void setTitle(int searchBy){
+        switch (searchBy) {
+            case Constants.SEARCH_BY_POPULARITY:
+                getActivity().setTitle(R.string.popular_movie);
+                break;
+            case Constants.SEARCH_BY_RATING:
+                getActivity().setTitle(R.string.movie_by_rating);
+                break;
+            case Constants.SEARCH_BY_FAVORITE:
+                getActivity().setTitle(R.string.favorite_movie);
+                break;
+            default:
+        }
+    }
     /**
      * display progressbar Whenever there is server call.
      */
@@ -329,15 +362,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                 loaderManager.restartLoader(SEARCH_MOVIE_LOADER_ID, bundle, movieSearchLoaderListener);
             }
 
-            switch (searchBy) {
-                case Constants.SEARCH_BY_POPULARITY:
-                    getActivity().setTitle(R.string.popular_movie);
-                    break;
-                case Constants.SEARCH_BY_RATING:
-                    getActivity().setTitle(R.string.movie_by_rating);
-                    break;
-                default:
-            }
+
         }
     }
 
@@ -374,7 +399,6 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
      * query database to get favorite movies
      */
     private void fetchFavoriteMovies() {
-        getActivity().setTitle(R.string.favorite_movie);
         LoaderManager loaderManager = getLoaderManager();
         Loader<Cursor> favoriteMovieLoader = loaderManager.getLoader(FAVORITE_MOVIE_LOADER_ID);
         if (favoriteMovieLoader == null) {
@@ -405,6 +429,8 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
     private void setGridAdapter() {
         if (mMovieList == null)
             return;
+        if(requireToCleanNoMovie())
+            removeNoFavoriteMovieScreen();
         mMovieAdapter = new MoviePosterAdapter(mSourceContext, mMovieList, this);
         mPosterRecyclerView.setAdapter(mMovieAdapter);
         mMovieAdapter.notifyDataSetChanged();
@@ -422,8 +448,10 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        MovieModel movie = mMovieList.get(position);
-        displayDetailActivity(movie, mSourceContext, mTwoPanelLayout);
+        if(position >= 0){
+            MovieModel movie = mMovieList.get(position);
+            displayDetailActivity(movie, mSourceContext, mTwoPanelLayout);
+        }
     }
 
     private List<MovieModel> getDataFromCursor(Cursor data) {
