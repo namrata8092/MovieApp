@@ -22,6 +22,10 @@ public class MovieContentProvider extends ContentProvider {
     private static final int FAV_SELECTED_MOVIE_TASK = 101;
     private static UriMatcher sUriMatcher = buildUriMatcher();
 
+    /**
+     * URI matcher added all possible URIs
+     * @return
+     */
     private static UriMatcher buildUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(MovieContract.AUTHORITY, MovieContract.FAVORITE_PATH, FAV_MOVIE_TASK);
@@ -60,6 +64,11 @@ public class MovieContentProvider extends ContentProvider {
         return queriedCursor;
     }
 
+    /**
+     * returns best matching uri
+     * @param uri
+     * @return
+     */
     @Nullable
     @Override
     public String getType(Uri uri) {

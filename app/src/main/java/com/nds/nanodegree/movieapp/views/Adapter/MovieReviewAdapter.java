@@ -12,7 +12,7 @@ import com.nds.nanodegree.movieapp.model.ReviewModel;
 
 import java.util.List;
 
-/**
+/**MovieReviewAdapter is custom adapter to display reviews.
  * Created by Namrata Shah on 3/29/2017.
  */
 

@@ -19,17 +19,19 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/layout_margin"
-                android:paddingRight="@dimen/layout_margin"
-                android:paddingTop="@dimen/layout_margin">
+                android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/movieThumbnail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
                     android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"/>
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="@dimen/layout_margin"
+                    android:paddingRight="@dimen/layout_margin"
+                    android:paddingTop="@dimen/layout_margin"
+                    android:paddingBottom="@dimen/layout_margin"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -40,15 +42,17 @@
 
                     <TextView
                         android:id="@+id/releaseDate"
-                        style="@style/SubTitle"/>
+                        style="@style/SubTitle"
+                        tool:text="date"/>
 
                     <TextView
                         android:id="@+id/averageRating"
-                        style="@style/SubTitle"/>
+                        style="@style/SubTitle"
+                        tool:text="average"/>
 
                     <TextView
                         android:id="@+id/addToFavorite"
-                        style="@style/SubTitle"
+                        style="@style/favorite"
                         android:text="@string/add_to_favorite"
                         android:drawableRight="@mipmap/favorite_disable"/>
 

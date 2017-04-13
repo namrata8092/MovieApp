@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * It converts Movie trailer transfer object to model.
+ */
+/**
  * Created by Namrata Shah on 3/29/2017.
  */
 

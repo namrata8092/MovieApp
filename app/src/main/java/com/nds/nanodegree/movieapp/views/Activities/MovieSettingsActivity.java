@@ -8,7 +8,10 @@ import android.view.MenuItem;
 import com.nds.nanodegree.movieapp.R;
 import com.nds.nanodegree.movieapp.views.fragments.MovieSettingsFragment;
 
-/**
+/** MOvie settings will allow user to select sort option either by
+ * 1. Favorite
+ * 2. Popular
+ * 3. Top rated
  * Created by Namrata Shah on 4/3/2017.
  */
 
@@ -19,7 +22,8 @@ public class MovieSettingsActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_settings);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportFragmentManager().beginTransaction().replace(R.id.movie_settings_fragment, new MovieSettingsFragment(), getString(R.string.movie_pref_sort_key)).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.movie_settings_fragment,
+                new MovieSettingsFragment(), getString(R.string.movie_pref_sort_key)).commit();
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

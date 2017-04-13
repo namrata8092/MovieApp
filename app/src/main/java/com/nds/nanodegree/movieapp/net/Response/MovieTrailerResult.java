@@ -5,7 +5,7 @@ import com.nds.nanodegree.movieapp.net.tos.MovieTrailers;
 
 import java.util.List;
 
-/**
+/**Movie trailer response transfer object
  * Created by Namrata Shah on 3/27/2017.
  */
 

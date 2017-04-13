@@ -8,6 +8,9 @@ import com.nds.nanodegree.movieapp.net.tos.MovieReviewResult;
 
 import java.util.ArrayList;
 import java.util.List;
+/**
+ * It converts Movie review transfer object to model.
+ */
 
 /**
  * Created by Namrata Shah on 3/29/2017.

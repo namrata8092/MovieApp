@@ -3,7 +3,7 @@ package com.nds.nanodegree.movieapp.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
+/** Movie review model.
  * Created by Namrata Shah on 3/27/2017.
  */
 

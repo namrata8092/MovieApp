@@ -37,6 +37,11 @@ public class MovieSettingsFragment extends PreferenceFragmentCompat implements
         }
     }
 
+    /**
+     * Setting summary based on user selection
+     * @param preference
+     * @param value
+     */
     private void setPreferenceSummary(Preference preference, Object value) {
         String stringValue = value.toString();
         if (preference instanceof ListPreference) {

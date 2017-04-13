@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tool="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/card_view"
+    android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginLeft="6dp"
+    android:layout_marginRight="6dp"
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="6dp"
+    card_view:cardUseCompatPadding="true"
+    card_view:contentPadding="10dp"
+    card_view:cardBackgroundColor="#DCDCDC">
 
-    <TextView android:id="@+id/reviewAuthorTextView"
-        style="@style/reviewAuthor"
-        tool:text="author"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <TextView android:id="@+id/reviewContentTextView"
-        style="@style/reviewContent"
-        tool:text="content"/>
-</LinearLayout>
+        <TextView
+            android:id="@+id/reviewAuthorTextView"
+            style="@style/reviewAuthor"
+            tool:text="author" />
+
+        <TextView
+            android:id="@+id/reviewContentTextView"
+            style="@style/reviewContent"
+            tool:text="content" />
+    </LinearLayout>
+</android.support.v7.widget.CardView>

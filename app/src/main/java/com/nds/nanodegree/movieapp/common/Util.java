@@ -19,6 +19,7 @@ import java.util.Scanner;
  * 1. Network availability
  * 2. Device screen dimensions
  * 3. Building appropriate URLs
+ * 4. Display toast message
  */
 
 /**
@@ -123,7 +124,7 @@ public final class Util {
     }
 
     /**
-     * Builds movie search URL based on selection.
+     * Builds movie search URL based on selection & movie ID.
      * @return search URL as string
      */
     public static String buildMovieURL(int selection, String movieID){
@@ -178,6 +179,11 @@ public final class Util {
         return (int) deviceWidth/CELL_WIDTH;
     }
 
+    /**
+     * This method is to display toast message whenever there is error or need to notify user
+     * @param cnt
+     * @param msg
+     */
     public static void createToastMsg(Context cnt, String msg){
         if(cnt != null)
         Toast.makeText(cnt, msg, Toast.LENGTH_SHORT).show();

@@ -14,19 +14,20 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">@dimen/font_medium</item>
-        <item name="android:layout_margin">10dp</item>
+        <item name="android:textSize">@dimen/font_small</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:maxLines">2</item>
     </style>
 
     <style name="Original_title">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">@dimen/font_extra_large</item>
+        <item name="android:textSize">@dimen/font_large</item>
         <item name="android:gravity">left|center_vertical</item>
         <item name="android:paddingLeft">20dp</item>
-        <item name="android:paddingBottom">50dp</item>
-        <item name="android:paddingTop">50dp</item>
+        <item name="android:paddingBottom">20dp</item>
+        <item name="android:paddingTop">20dp</item>
         <item name="android:background">@color/colorAccent</item>
     </style>
 
@@ -61,11 +62,12 @@
     <style name="favorite">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@mipmap/favorite_disable</item>
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:layout_gravity">left</item>
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
+        <item name="android:textColor">@color/darkGray</item>
+        <item name="android:textSize">@dimen/font_medium</item>
     </style>
 
     <style name="reviewAuthor" parent="Title">
@@ -97,4 +99,6 @@
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
     </style>
+
+
 </resources>

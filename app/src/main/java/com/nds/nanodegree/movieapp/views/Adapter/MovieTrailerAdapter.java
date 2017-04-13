@@ -14,7 +14,7 @@ import com.nds.nanodegree.movieapp.model.TrailerModel;
 
 import java.util.List;
 
-/**
+/**MovieTrailerAdapter is custom adapter to display trailers.
  * Created by Namrata Shah on 3/29/2017.
  */
 

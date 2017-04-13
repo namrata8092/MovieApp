@@ -98,6 +98,8 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
                 .load(Util.createImageURI(movieModel.getBackDropURL()))
                 .override(dimensions[0], dimensions[1]).into(mThumbNailImageView);
 
+        if(movieModel.getReviews()!=null)
+            setMovieReviews(movieModel.getReviews());
 
         return view;
     }
@@ -165,10 +167,13 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
                 updateFavoriteMovieToDB.execute();
                 break;
             case R.id.trailer:
-                if (movieModel.getTrailers() == null || movieModel.getTrailers().size() == 0 || movieModel.getTrailers().isEmpty()) {
+                if (movieModel.getTrailers() == null ||
+                        movieModel.getTrailers().size() == 0 ||
+                        movieModel.getTrailers().isEmpty()) {
                     FetchMovieTrailers fetchMovieTrailers = null;
                     try {
-                        fetchMovieTrailers = new FetchMovieTrailers( new URL(Util.buildMovieURL(Constants.TRAILER_URL, movieModel.getID())),
+                        fetchMovieTrailers = new FetchMovieTrailers(
+                                new URL(Util.buildMovieURL(Constants.TRAILER_URL, movieModel.getID())),
                                 new FetchMovieTrailers.MovieTrailerResponse() {
                                     @Override
                                     public void getMovieTrailerResults(List<TrailerModel> result) {
@@ -185,13 +190,20 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
                 }
                 break;
             case R.id.review:
-                if(movieModel.getReviews() == null || movieModel.getReviews().isEmpty() || movieModel.getReviews().size() == 0){
+                if(movieModel.getReviews() == null ||
+                        movieModel.getReviews().isEmpty() ||
+                        movieModel.getReviews().size() == 0){
                     try {
-                        FetchMovieReviews fetchMovieReviews = new FetchMovieReviews(new URL(Util.buildMovieURL(Constants.REVIEW_URL, movieModel.getID())),
+                        FetchMovieReviews fetchMovieReviews = new FetchMovieReviews(
+                                new URL(Util.buildMovieURL(Constants.REVIEW_URL, movieModel.getID())),
                                 new FetchMovieReviews.MovieReviewResponse() {
                             @Override
                             public void getMovieReviewResults(List<ReviewModel> result) {
                                 movieModel.setReviews(result);
+                                if(result == null || result.size() == 0){
+                                    Util.createToastMsg(getActivity(),getString(R.string.no_review, movieModel.getTitle()));
+                                    return;
+                                }
                                 setMovieReviews(result);
                             }
                         });
@@ -205,11 +217,11 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
         }
     }
 
+    /**
+     * Display movie review list when user clicks on review option
+     * @param reviews
+     */
     private void setMovieReviews(List<ReviewModel> reviews) {
-        if(reviews == null || reviews.size() == 0){
-            Util.createToastMsg(getActivity(),getString(R.string.no_review, movieModel.getTitle()));
-            return;
-        }
         mReviewRecyclerView.setVisibility(View.VISIBLE);
         mReviewRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mReviewRecyclerView.setHasFixedSize(true);
@@ -217,6 +229,11 @@ public class MovieDetailFragment extends Fragment implements FavoriteMovieUpdate
         mReviewRecyclerView.setAdapter(adapter);
     }
 
+    /**
+     * Display dialog with list of trailer link.
+     * on select of list item, provide chooser option to user, either to view in browser or youtube.
+     * @param result
+     */
     private void setMovieTrailerList(final List<TrailerModel> result) {
         if(result == null || result.size() == 0){
             Util.createToastMsg(getActivity(),getString(R.string.no_trailer, movieModel.getTitle()));
