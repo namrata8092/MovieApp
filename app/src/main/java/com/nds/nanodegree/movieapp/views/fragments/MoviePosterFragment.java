@@ -212,14 +212,18 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
             @Override
             public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-                mMovieList = getDataFromCursor(data);
                 hideProgressBar();
-                if(mMovieList.size() == 0){
-                    showNoFavoriteMovieScreen();
-                    mMovieList = null;
+                if(isFavoriteMovieSearch(mMoviePreferences)){
+                    mMovieList = getDataFromCursor(data);
+                    if(mMovieList.size() == 0){
+                        showNoFavoriteMovieScreen();
+                        mMovieList = null;
+                        return;
+                    }
+                    setGridAdapter();
+                }else{
                     return;
                 }
-                setGridAdapter();
             }
 
             @Override
@@ -240,13 +244,23 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
     }
 
+    private boolean isFavoriteMovieSearch(SharedPreferences mMoviePreferences){
+        return mMoviePreferences.getString(getString(R.string.movie_pref_sort_key), "")
+                .equals(getString(R.string.preference_favorite_movie_key));
+    }
+
     private void showNoFavoriteMovieScreen() {
         mPosterRecyclerView.setVisibility(View.GONE);
         mNoFavoriteMovieTextView.setVisibility(View.VISIBLE);
+        if(mTwoPanelLayout){
+
+        }
     }
 
     private boolean requireToCleanNoMovie(){
-        return mPosterRecyclerView.getVisibility() == View.GONE && mNoFavoriteMovieTextView.getVisibility() == View.VISIBLE;
+        return (mPosterRecyclerView.getVisibility() == View.GONE
+                && mNoFavoriteMovieTextView.getVisibility() == View.VISIBLE)
+                || !isFavoriteMovieSearch(mMoviePreferences);
     }
 
     private void removeNoFavoriteMovieScreen() {
@@ -263,6 +277,8 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                 mMovieList == null) {
             mMovieSortChoice = savedMoviePreference;
             refreshMovieListWithNewChoice(mMovieSortChoice, true);
+        }else{
+            setGridAdapter();
         }
     }
 
@@ -462,7 +478,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if(position >= 0){
+        if( mMovieList.size() > 0 && !mMovieList.isEmpty() && mMovieList!=null){
             MovieModel movie = mMovieList.get(position);
             displayDetailActivity(movie, mSourceContext, mTwoPanelLayout);
         }
