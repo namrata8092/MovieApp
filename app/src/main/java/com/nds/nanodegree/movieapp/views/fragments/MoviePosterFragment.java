@@ -50,7 +50,7 @@ import java.util.List;
  * Created by Namrata Shah on 4/2/2017.
  */
 
-public class MoviePosterFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class MoviePosterFragment extends Fragment implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private RecyclerView mPosterRecyclerView;
     private MoviePosterAdapter mMovieAdapter;
     private List<MovieModel> mMovieList;
@@ -107,6 +107,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
         if (getActivity().findViewById(R.id.movieDetailContainer) != null) {
             mTwoPanelLayout = true;
+            Util.setTablet(true);
         }
         return view;
     }
@@ -215,9 +216,10 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
                 hideProgressBar();
                 if(isFavoriteMovieSearch(mMoviePreferences)){
                     mMovieList = getDataFromCursor(data);
-                    if(mMovieList.size() == 0){
+                    if(mMovieList == null){
                         showNoFavoriteMovieScreen();
-                        mMovieList = null;
+                        if(mMovieAdapter!=null)
+                            mMovieAdapter.notifyDataSetChanged();
                         return;
                     }
                     setGridAdapter();
@@ -244,28 +246,58 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mMoviePreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        mMoviePreferences.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+
+    /**
+     * Check if current view displays movie by favorite
+     * @param mMoviePreferences
+     * @return
+     */
     private boolean isFavoriteMovieSearch(SharedPreferences mMoviePreferences){
         return mMoviePreferences.getString(getString(R.string.movie_pref_sort_key), "")
                 .equals(getString(R.string.preference_favorite_movie_key));
     }
 
+    /**
+     * Display view when there is no favorite movies.
+     */
     private void showNoFavoriteMovieScreen() {
         mPosterRecyclerView.setVisibility(View.GONE);
         mNoFavoriteMovieTextView.setVisibility(View.VISIBLE);
         if(mTwoPanelLayout){
-
+            getActivity().findViewById(R.id.movieDetailContainer).setVisibility(View.GONE);
         }
     }
 
+    /**
+     * Check if we want to update current view from no favorite movie
+     * @return
+     */
     private boolean requireToCleanNoMovie(){
         return (mPosterRecyclerView.getVisibility() == View.GONE
                 && mNoFavoriteMovieTextView.getVisibility() == View.VISIBLE)
                 || !isFavoriteMovieSearch(mMoviePreferences);
     }
 
+    /**
+     * Update view from no favorite movie to new view with movies based on selection
+     */
     private void removeNoFavoriteMovieScreen() {
         mPosterRecyclerView.setVisibility(View.VISIBLE);
         mNoFavoriteMovieTextView.setVisibility(View.GONE);
+        if(mTwoPanelLayout){
+            getActivity().findViewById(R.id.movieDetailContainer).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -460,7 +492,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
         mMovieAdapter = new MoviePosterAdapter(mSourceContext, mMovieList, this);
         mPosterRecyclerView.setAdapter(mMovieAdapter);
         mMovieAdapter.notifyDataSetChanged();
-        if (mTwoPanelLayout)
+        if (mTwoPanelLayout && mMovieList.size() > 0)
             mHandler.sendEmptyMessage(Constants.DISPLAY_DETAIL_FRAGMENT);
     }
 
@@ -490,7 +522,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
      * @return
      */
     private List<MovieModel> getDataFromCursor(Cursor data) {
-        List<MovieModel> models = new ArrayList<>();
+        List<MovieModel> models = null;
         int movieIDIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_ID);
         int movieTitleIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_TITLE);
         int movieOriginalTitleIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_ORIGINAL_TITLE);
@@ -501,6 +533,7 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
         int movieVoteAverageIndex = data.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_MOVIE_VOTE_AVERAGE);
 
         if (data != null && data.getCount() > 0) {
+            models = new ArrayList<>();
             try {
                 for (data.moveToFirst(); !data.isAfterLast(); data.moveToNext()) {
                     MovieModel model = new MovieModel(data.getString(movieIDIndex),
@@ -519,6 +552,14 @@ public class MoviePosterFragment extends Fragment implements AdapterView.OnItemC
             }
         }
         return models;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(getContext().getString(R.string.preference_movie_delete_key).equals(key) && sharedPreferences.getBoolean(key, false)){
+            sharedPreferences.edit().putBoolean(key, false).apply();
+            fetchFavoriteMovies();
+        }
     }
 }
 

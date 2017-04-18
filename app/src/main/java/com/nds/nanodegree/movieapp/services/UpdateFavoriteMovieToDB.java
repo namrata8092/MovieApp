@@ -3,11 +3,15 @@ package com.nds.nanodegree.movieapp.services;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 
+import com.nds.nanodegree.movieapp.R;
 import com.nds.nanodegree.movieapp.common.Constants;
+import com.nds.nanodegree.movieapp.common.Util;
 import com.nds.nanodegree.movieapp.dbo.MovieContract;
 import com.nds.nanodegree.movieapp.model.FavoriteMovieUpdateListener;
 import com.nds.nanodegree.movieapp.model.MovieModel;
@@ -51,6 +55,11 @@ public class UpdateFavoriteMovieToDB extends AsyncTask {
 
             if (rowDeleted > 0) {
                 updateListener.onSuccess(Constants.REMOVED_FROM_FAVORITE);
+                if(Util.isTablet()){
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+                    SharedPreferences.Editor edit = preferences.edit();
+                    edit.putBoolean(mContext.getString(R.string.preference_movie_delete_key), true).commit();
+                }
             } else {
                 updateListener.onFailure();
             }

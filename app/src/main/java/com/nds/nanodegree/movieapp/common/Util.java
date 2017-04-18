@@ -27,6 +27,8 @@ import java.util.Scanner;
  */
 public final class Util {
 
+    public static boolean tablet;
+
     public Util() {
     }
 
@@ -187,5 +189,13 @@ public final class Util {
     public static void createToastMsg(Context cnt, String msg){
         if(cnt != null)
         Toast.makeText(cnt, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public static boolean isTablet() {
+        return tablet;
+    }
+
+    public static void setTablet(boolean tablet) {
+        Util.tablet = tablet;
     }
 }
